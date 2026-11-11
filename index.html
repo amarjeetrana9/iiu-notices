@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IIU Digital Notice Board</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-[#780016] text-white shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center space-x-3 text-center sm:text-left">
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold tracking-wide uppercase">Indus International University</h1>
+          <p class="text-xs text-rose-200">Official Circulars, Timetables & Examination Portal</p>
+        </div>
+      </div>
+      <div class="bg-rose-900/60 border border-rose-400/30 px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        Live Digital Desk
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-grow w-full">
+    
+    <!-- Filter & Search Controls -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Search Notice</label>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
+            <input type="text" id="searchInput" placeholder="Search by title..." 
+                   class="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#780016]">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Category</label>
+          <select id="categoryFilter" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#780016]">
+            <option value="All">All Categories</option>
+            <option value="Circular">Circular</option>
+            <option value="Date Sheet">Date Sheet</option>
+            <option value="Timetable">Timetable</option>
+            <option value="Urgent">Urgent</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Department</label>
+          <select id="deptFilter" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#780016]">
+            <option value="All">All Departments</option>
+            <option value="Engineering">Engineering & Technology</option>
+            <option value="Management">Management & Commerce</option>
+            <option value="Health Sciences">Health & Allied Sciences</option>
+            <option value="Education">Education</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notices Grid -->
+    <div id="noticeGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="col-span-full py-12 text-center text-slate-400">
+        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2 text-[#780016]"></i>
+        <p class="text-sm">Fetching verified notifications...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    Indus International University &copy; 2026. Official Notice & Records Dissemination Desk.
+  </footer>
+
+  <script>
+    // REPLACE THIS WITH YOUR ACTUAL GOOGLE SPREADSHEET ID
+    const SHEET_ID = 'e/2PACX-1vSSRzDrNV8eMFNbBUCD7COsTTa4uzz5YVOc9iTrQCYE-euuucXXK4Du3jJSb3H9_FeYCJLkVYSUH9aY';
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSSRzDrNV8eMFNbBUCD7COsTTa4uzz5YVOc9iTrQCYE-euuucXXK4Du3jJSb3H9_FeYCJLkVYSUH9aY/pubhtml`;
+
+    let allNotices = [];
+
+    async function fetchNotices() {
+      try {
+        const response = await fetch(SHEET_URL);
+        const text = await response.text();
+        
+        // Strip Google's JSON wrapper
+        const jsonData = JSON.parse(text.substring(47).slice(0, -2));
+        const rows = jsonData.table.rows;
+
+        allNotices = rows.map(r => {
+          const cells = r.c;
+          return {
+            date: cells[0] ? cells[0].f || cells[0].v : 'N/A',
+            title: cells[1] ? cells[1].v : 'Untitled Notice',
+            category: cells[2] ? cells[2].v : 'General',
+            department: cells[3] ? cells[3].v : 'All',
+            audience: cells[4] ? cells[4].v : 'All',
+            link: cells[5] ? cells[5].v : '#',
+            status: cells[6] ? cells[6].v : 'Active'
+          };
+        }).filter(item => item.status && item.status.toString().toLowerCase() === 'active');
+
+        renderNotices(allNotices);
+      } catch (err) {
+        document.getElementById('noticeGrid').innerHTML = `
+          <div class="col-span-full text-center py-10 text-red-500">
+            <i class="fa-solid fa-triangle-exclamation text-2xl mb-2"></i>
+            <p>Unable to load notices. Please check connection and Sheet ID.</p>
+          </div>`;
+      }
+    }
+
+    function renderNotices(list) {
+      const container = document.getElementById('noticeGrid');
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-12 text-slate-400">
+            <i class="fa-regular fa-folder-open text-3xl mb-2"></i>
+            <p class="text-sm">No notifications found matching your selection.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(item => {
+        const isUrgent = item.category.toLowerCase() === 'urgent';
+        return `
+          <div class="bg-white rounded-lg border ${isUrgent ? 'border-red-300 ring-1 ring-red-200' : 'border-slate-200'} shadow-sm hover:shadow-md transition-shadow p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+                <span class="inline-flex items-center gap-1 font-semibold text-slate-700">
+                  <i class="fa-regular fa-calendar"></i> ${item.date}
+                </span>
+                <span class="px-2 py-0.5 rounded text-[11px] font-medium ${isUrgent ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'}">
+                  ${item.category}
+                </span>
+              </div>
+              <h3 class="text-sm font-semibold text-slate-900 leading-snug mb-2">${item.title}</h3>
+              <div class="flex flex-wrap gap-1 mb-4 text-[11px]">
+                <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${item.department}</span>
+                <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${item.audience}</span>
+              </div>
+            </div>
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer" 
+               class="inline-flex items-center justify-center gap-2 w-full py-2 px-3 text-xs font-semibold text-white bg-[#780016] hover:bg-[#5a0011] rounded-md transition-colors">
+              <i class="fa-solid fa-file-pdf"></i> View / Download Document
+            </a>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function applyFilters() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const cat = document.getElementById('categoryFilter').value;
+      const dept = document.getElementById('deptFilter').value;
+
+      const filtered = allNotices.filter(item => {
+        const matchesQuery = item.title.toLowerCase().includes(query);
+        const matchesCat = cat === 'All' || item.category.toLowerCase() === cat.toLowerCase();
+        const matchesDept = dept === 'All' || item.department.toLowerCase() === dept.toLowerCase() || item.department.toLowerCase() === 'all';
+        return matchesQuery && matchesCat && matchesDept;
+      });
+
+      renderNotices(filtered);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+    document.getElementById('deptFilter').addEventListener('change', applyFilters);
+
+    window.addEventListener('DOMContentLoaded', fetchNotices);
+  </script>
+</body>
+</html>
