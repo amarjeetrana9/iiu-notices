@@ -17,23 +17,72 @@
           <p class="text-xs text-rose-200">Official Circulars, Timetables & Examination Portal</p>
         </div>
       </div>
+
+      <!-- Right Controls: Live Badge + UMS Navigation Dropdown -->
       <div class="flex items-center gap-3">
         <div class="bg-rose-900/60 border border-rose-400/30 px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           Live Digital Desk
         </div>
-        <a href="https://script.google.com/macros/s/AKfycbyQUr2q-PsIcm5_shgIC2xJC2qeyNLZ2ZH7uBrghgH96szFlMGTljnBDta66HjM7b1j/exec" target="_blank" rel="noopener noreferrer"
-           class="bg-white text-[#780016] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-rose-50 transition-all inline-flex items-center gap-1.5">
-          <i class="fa-solid fa-user-lock"></i> Faculty Task Desk
-        </a>
+
+        <!-- UMS Navigation Dropdown -->
+        <div class="relative" id="umsDropdownWrapper">
+          <button type="button" id="umsDropdownBtn" onclick="toggleUmsDropdown()"
+                  class="bg-white text-[#780016] px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-rose-50 transition-all inline-flex items-center gap-2 shadow-sm">
+            <i class="fa-solid fa-grid-2"></i>
+            <i class="fa-solid fa-bars"></i>
+            <span>UMS Navigation</span>
+            <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200" id="umsChevron"></i>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="umsDropdownMenu" 
+               class="hidden absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-slate-800">
+            <div class="px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+              University Portals
+            </div>
+            
+            <a href="https://script.google.com/macros/s/AKfycbyQUr2q-PsIcm5_shgIC2xJC2qeyNLZ2ZH7uBrghgH96szFlMGTljnBDta66HjM7b1j/exec" 
+               target="_blank" rel="noopener noreferrer"
+               class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-rose-50 hover:text-[#780016] transition-colors">
+              <span class="w-7 h-7 rounded-lg bg-rose-100 text-[#780016] flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-user-lock"></i>
+              </span>
+              <div>
+                <div>Faculty Task Desk</div>
+                <div class="text-[10px] font-normal text-slate-400">Task tracking & submissions</div>
+              </div>
+            </a>
+
+            <a href="https://script.google.com/macros/s/AKfycbwyN3rQyDdf3qWI1EtV8rIm5FJ18pkJq2ts3Lo5IkADtNmgFEnyHBWfpgip2D7lpcm_/exec" 
+               target="_blank" rel="noopener noreferrer"
+               class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-rose-50 hover:text-[#780016] transition-colors">
+              <span class="w-7 h-7 rounded-lg bg-rose-100 text-[#780016] flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-hashtag"></i>
+              </span>
+              <div>
+                <div>Reference Number Generator</div>
+                <div class="text-[10px] font-normal text-slate-400">Official dispatch & letter IDs</div>
+              </div>
+            </a>
+
+            <a href="https://script.google.com/macros/s/AKfycbx-LGpQYqlICV91ttH5mrwG8y0P8b4Y4nLImkrE-zLiHTAJQ8tzGzps83Z4QN9I_J5EMQ/exec" 
+               target="_blank" rel="noopener noreferrer"
+               class="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-rose-50 hover:text-[#780016] transition-colors">
+              <span class="w-7 h-7 rounded-lg bg-rose-100 text-[#780016] flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-file-excel"></i>
+              </span>
+              <div>
+                <div>OBP Template</div>
+                <div class="text-[10px] font-normal text-slate-400">Search & download metric sheets</div>
+              </div>
+            </a>
           </div>
-        <a href="https://script.google.com/macros/s/AKfycbwyN3rQyDdf3qWI1EtV8rIm5FJ18pkJq2ts3Lo5IkADtNmgFEnyHBWfpgip2D7lpcm_/exec " target="_blank" rel="noopener noreferrer"
-   class="bg-white text-[#780016] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-rose-50 transition-all inline-flex items-center gap-1.5">
-  <i class="fa-solid fa-hashtag"></i>
-  <span>Reference Number Generator</span>
-</a>
         </div>
+      </div>
+    </div>
   </header>
+
   <!-- Main Content Container -->
   <main class="max-w-6xl mx-auto px-4 py-6 flex-grow w-full">
     
@@ -81,6 +130,25 @@
   </footer>
 
   <script>
+    // UMS Navigation Dropdown Toggle
+    function toggleUmsDropdown() {
+      const menu = document.getElementById('umsDropdownMenu');
+      const chevron = document.getElementById('umsChevron');
+      menu.classList.toggle('hidden');
+      chevron.classList.toggle('rotate-180');
+    }
+
+    // Close dropdown if user clicks anywhere outside
+    document.addEventListener('click', function(event) {
+      const wrapper = document.getElementById('umsDropdownWrapper');
+      const menu = document.getElementById('umsDropdownMenu');
+      const chevron = document.getElementById('umsChevron');
+      if (wrapper && !wrapper.contains(event.target)) {
+        menu.classList.add('hidden');
+        chevron.classList.remove('rotate-180');
+      }
+    });
+
     const SHEET_ID = '1anOG84hyZKt8bDT4rB8Igc6cTbL6t4Y_jW4UPRDqYMc';
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
