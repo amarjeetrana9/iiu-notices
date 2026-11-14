@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IIU UMS Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #f8fafc;
+    }
+
+    /* Clips the 40px Google Apps Script security banner at the top */
+    .iframe-clipper {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 52px);
+      overflow: hidden;
+    }
+
+    .iframe-clipper iframe {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      width: 100%;
+      height: calc(100% + 40px);
+      border: none;
+    }
+  </style>
+</head>
+<body class="font-sans">
+
+  <!-- Top IIU Navigation Bar -->
+  <header class="bg-[#780016] text-white h-[52px] px-4 flex items-center justify-between shadow-md z-50 relative">
+    <div class="flex items-center gap-3">
+      <a href="index.html" 
+         class="bg-rose-900/70 hover:bg-rose-900 border border-rose-400/30 px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-colors">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Notice Board</span>
+      </a>
+      <div class="hidden sm:block h-4 w-px bg-rose-400/30"></div>
+      <span id="portalTitle" class="text-sm font-bold tracking-wide truncate">IIU UMS Portal</span>
+    </div>
+
+    <!-- Quick Switcher Between All 3 Portals -->
+    <div class="flex items-center gap-2">
+      <a href="portal.html?app=task" id="nav-task"
+         class="px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors bg-rose-900/50 hover:bg-white hover:text-[#780016]">
+        <i class="fa-solid fa-user-lock sm:mr-1"></i><span class="hidden md:inline">Faculty Task Desk</span>
+      </a>
+      <a href="portal.html?app=ref" id="nav-ref"
+         class="px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors bg-rose-900/50 hover:bg-white hover:text-[#780016]">
+        <i class="fa-solid fa-hashtag sm:mr-1"></i><span class="hidden md:inline">Reference Generator</span>
+      </a>
+      <a href="portal.html?app=obp" id="nav-obp"
+         class="px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors bg-rose-900/50 hover:bg-white hover:text-[#780016]">
+        <i class="fa-solid fa-file-excel sm:mr-1"></i><span class="hidden md:inline">OBP Template</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Banner-Free Embedded Portal Container -->
+  <div class="iframe-clipper">
+    <iframe id="appFrame" src="" allow="camera; microphone; clipboard-read; clipboard-write"></iframe>
+  </div>
+
+  <script>
+    const PORTALS = {
+      task: {
+        title: 'Faculty Task Desk — Indus International University',
+        url: 'https://script.google.com/macros/s/AKfycbyQUr2q-PsIcm5_shgIC2xJC2qeyNLZ2ZH7uBrghgH96szFlMGTljnBDta66HjM7b1j/exec'
+      },
+      ref: {
+        title: 'Reference Number Generator — Indus International University',
+        url: 'https://script.google.com/macros/s/AKfycbwyN3rQyDdf3qWI1EtV8rIm5FJ18pkJq2ts3Lo5IkADtNmgFEnyHBWfpgip2D7lpcm_/exec'
+      },
+      obp: {
+        title: 'OBP Template — Indus International University',
+        url: 'https://script.google.com/macros/s/AKfycbx-LGpQYqlICV91ttH5mrwG8y0P8b4Y4nLImkrE-zLiHTAJQ8tzGzps83Z4QN9I_J5EMQ/exec'
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const appKey = params.get('app') || 'obp';
+    const selected = PORTALS[appKey] || PORTALS.obp;
+
+    document.title = selected.title;
+    document.getElementById('portalTitle').textContent = selected.title;
+    document.getElementById('appFrame').src = selected.url;
+
+    // Highlight active portal button in top bar
+    const activeBtn = document.getElementById('nav-' + appKey);
+    if (activeBtn) {
+      activeBtn.classList.remove('bg-rose-900/50');
+      activeBtn.classList.add('bg-white', 'text-[#780016]');
+    }
+  </script>
+</body>
+</html>
