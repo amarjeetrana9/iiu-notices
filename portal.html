@@ -15,7 +15,7 @@
       background-color: #f8fafc;
     }
 
-    /* Clips the 40px Google Apps Script security banner at the top */
+    /* Clips ONLY the 26px Google Apps Script banner without hiding portal buttons */
     .iframe-clipper {
       position: relative;
       width: 100%;
@@ -25,10 +25,10 @@
 
     .iframe-clipper iframe {
       position: absolute;
-      top: -40px;
+      top: -26px;
       left: 0;
       width: 100%;
-      height: calc(100% + 40px);
+      height: calc(100% + 26px);
       border: none;
     }
   </style>
